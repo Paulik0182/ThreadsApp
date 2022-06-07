@@ -22,6 +22,9 @@ public class MainActivity extends AppCompatActivity {
         binding.startButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+                notMainThread();
+
                 doWork();
                 Toast.makeText(MainActivity.this, "Финиш", Toast.LENGTH_SHORT).show();
             }
@@ -39,7 +42,15 @@ public class MainActivity extends AppCompatActivity {
             }
             x += x;
         }
+    }
 
+    //запускаем не на главном потоке (асинхронный, поралельный поток)
+    //сам посебе Thread бесполезен, в него положить ничего нельзя.
+    //Необходимо сделать наследник Thread
+    private void notMainThread() {
+        Thread thread = new Thread();
+        thread.start();
+        thread.interrupt();//рекомендация остановить
     }
 
 }
