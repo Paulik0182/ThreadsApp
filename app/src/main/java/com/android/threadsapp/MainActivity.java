@@ -1,6 +1,7 @@
 package com.android.threadsapp;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -32,8 +33,16 @@ public class MainActivity extends AppCompatActivity {
 
     //бесконечный цыкл
     private void doWork() {
+        Thread currentThread = Thread.currentThread();//текущий поток в котором выполняется работа
+        Log.d("@@@ doWork", currentThread.getName());//лог текущего потока
+        currentThread.isInterrupted();//выесняем, нужно ли его (поток) приостановить.
+        // isInterrupted() это проставления фложка (boolean переменная) стоит ли его закончить.
+        // Потоки не убивают просто так, он должен закончить свою работу и завершить работу корректно.
+
+
         double x = Math.PI;
-        while (x < 1_000_000_000_000_000d) {
+        // && currentThread.isInterrupted() - и пока не завершон
+        while (x < 1_000_000_000_000_000d && currentThread.isInterrupted()) {
             try {
                 Thread.sleep(100);
             } catch (InterruptedException e) {
