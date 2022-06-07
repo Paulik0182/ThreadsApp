@@ -25,7 +25,6 @@ public class MainActivity extends AppCompatActivity {
 
                 notMainThread();
 
-                doWork();
                 Toast.makeText(MainActivity.this, "Финиш", Toast.LENGTH_SHORT).show();
             }
         });
@@ -52,10 +51,16 @@ public class MainActivity extends AppCompatActivity {
     //сам посебе Thread бесполезен, в него положить ничего нельзя.
     //Необходимо сделать наследник Thread
     private void notMainThread() {
-        Thread thread = new Thread(new myRunnable());
+        Thread thread = new myThread();
         thread.start();
-        thread.interrupt();//рекомендация остановить
+//        thread.interrupt();//рекомендация остановить
     }
+
+    /**
+     * У thread можно вызвать метод .start() или .run()
+     * В случае вызвова метод .run() это будет всеволиш вызов метода, никакой асинхронной работы не будет.
+     * А с вызовом .start() сначало будет запущена поралельная работа, а потом выполнение нужного кода.
+     */
 
     //Необходимо сделать наследник Thread
     class myThread extends Thread {
@@ -63,7 +68,7 @@ public class MainActivity extends AppCompatActivity {
         //метод который будет выполнятся код
         @Override
         public void run() {
-            super.run();
+            doWork();
         }
     }
 
