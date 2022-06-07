@@ -60,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
     //сам посебе Thread бесполезен, в него положить ничего нельзя.
     //Необходимо сделать наследник Thread
     private void notMainThread() {
-        Thread thread = new myThread();
+        Thread thread = new Thread(new myRunnable(), "Это я, не главный поток");
         thread.start();
 //        thread.interrupt();//рекомендация остановить
     }
