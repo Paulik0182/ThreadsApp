@@ -53,4 +53,15 @@ public class MainActivity extends AppCompatActivity {
         thread.interrupt();//рекомендация остановить
     }
 
+    //Необходимо сделать наследник Thread
+    class myThread extends Thread {
+
+        //метод который будет выполнятся код
+        @Override
+        public void run() {
+            super.run();
+        }
+    }
+
+
 }
