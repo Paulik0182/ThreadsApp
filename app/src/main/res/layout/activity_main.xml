@@ -14,4 +14,14 @@
         android:layout_height="wrap_content"
         android:text="START"/>
 
+    <CheckBox
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="Привет"/>
+
+    <CheckBox
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Выбор"/>
+
 </LinearLayout>

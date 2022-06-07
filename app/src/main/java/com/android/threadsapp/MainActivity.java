@@ -17,6 +17,7 @@ import com.android.threadsapp.databinding.ActivityMainBinding;
 
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -28,6 +29,23 @@ public class MainActivity extends AppCompatActivity {
 
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
+        binding.startButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                doWork();
+                Toast.makeText(MainActivity.this, "Финиш", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    //мы приостанавливаем работу на главном потоке, обязательно обработать исключение
+    private void doWork(){
+        try {
+            Thread.sleep(10_000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
     }
 
