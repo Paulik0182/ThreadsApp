@@ -63,5 +63,11 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    //наследуем метод Runnable (запускаемый объект)
+    class myRunnable implements Runnable {
+        @Override
+        public void run() {
 
+        }
+    }
 }
