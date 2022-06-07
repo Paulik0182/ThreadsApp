@@ -44,11 +44,15 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * В данных изменениях. Создается thread куда кладется работа myRunnable и запускается start()
+     * В фоне запускается именно myRunnable() поток
+     */
     //запускаем не на главном потоке (асинхронный, поралельный поток)
     //сам посебе Thread бесполезен, в него положить ничего нельзя.
     //Необходимо сделать наследник Thread
     private void notMainThread() {
-        Thread thread = new Thread();
+        Thread thread = new Thread(new myRunnable());
         thread.start();
         thread.interrupt();//рекомендация остановить
     }
@@ -67,7 +71,7 @@ public class MainActivity extends AppCompatActivity {
     class myRunnable implements Runnable {
         @Override
         public void run() {
-
+            doWork();
         }
     }
 }
