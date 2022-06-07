@@ -39,12 +39,11 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    //мы приостанавливаем работу на главном потоке, обязательно обработать исключение
-    private void doWork(){
-        try {
-            Thread.sleep(10_000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+    //бесконечный цыкл
+    private void doWork() {
+        double x = Math.PI;
+        while (true) {
+            x += x;
         }
 
     }
