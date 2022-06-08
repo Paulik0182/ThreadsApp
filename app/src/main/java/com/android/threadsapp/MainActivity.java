@@ -28,15 +28,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void doWork() {
-        Thread currentThread = Thread.currentThread();//текущий поток в котором выполняется работа
-        Log.d("@@@ doWork", currentThread.getName());//лог текущего потока
-        currentThread.isInterrupted();//выесняем, нужно ли его (поток) приостановить.
+        Log.d("@@@ doWork", Thread.currentThread().getName());//лог текущего потока
+        Thread.currentThread().isInterrupted();//выесняем, нужно ли его (поток) приостановить.
         // isInterrupted() это проставления фложка (boolean переменная) стоит ли его закончить.
         // Потоки не убивают просто так, он должен закончить свою работу и завершить работу корректно.
 
         double x = Math.PI;
         // && currentThread.isInterrupted() - и пока не завершон
-        while (x < 1_000_000_000_000d && !currentThread.isInterrupted()) {
+        while (x < 1_000_000_000_000d && !Thread.currentThread().isInterrupted()) {
             try {
                 Thread.sleep(150);
             } catch (InterruptedException e) {
@@ -44,7 +43,16 @@ public class MainActivity extends AppCompatActivity {
             }
             x += x;
         }
-        binding.resultTextView.setText("ФИНИШ!");
+        Log.d("@@@ doWork", Thread.currentThread().getName());//лог текущего потока
+        //У любой Активити есть метод run. можно перенести, вернуть поток в главный поток (Пример1)
+        //Ниже приведенный код выполняется на другом потоке
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Log.d("@@@ doWork", Thread.currentThread().getName());//лог текущего потока
+                binding.resultTextView.setText("ФИНИШ!");
+            }
+        });
     }
 
     /**
