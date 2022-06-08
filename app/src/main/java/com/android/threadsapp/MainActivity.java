@@ -43,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
         Log.d("@@@ doWork", Thread.currentThread().getName());//лог текущего потока
         Thread.currentThread().isInterrupted();//выесняем, нужно ли его (поток) приостановить.
         // isInterrupted() это проставления фложка (boolean переменная) стоит ли его закончить.
-        // Потоки не убивают просто так, он должен закончить свою работу и завершить работу корректно.
+        // Потоки не убивают просто так, он должен закончить свою работу и завершить работу корректно
 
         double x = Math.PI;
         // && currentThread.isInterrupted() - и пока не завершон
