@@ -26,7 +26,7 @@ public class MainActivity extends AppCompatActivity {
 
                 notMainThread();
 
-                Toast.makeText(MainActivity.this, "Финиш", Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, "Старт", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -50,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
             }
             x += x;
         }
+        Toast.makeText(MainActivity.this, "Финиш", Toast.LENGTH_SHORT).show();
     }
 
     /**
