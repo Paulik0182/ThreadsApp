@@ -17,12 +17,18 @@ public class MainActivity extends AppCompatActivity {
     private final Handler handler = new Handler(Looper.getMainLooper());//специальный объект.
     // это единственный способ положить задачу в очередь.
     //Можно положить Looper в главном потоке
+    /**
+     * Фишки потоков. Если глобально объявить переменную, то она будет доступна на любом потоке.
+     */
+    private double y = 0;//переменная доступная на любом потоке.
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
+        y = 1d;
 
         binding.startButton.setOnClickListener(view -> {
             notMainThread();
@@ -43,6 +49,7 @@ public class MainActivity extends AppCompatActivity {
         // && currentThread.isInterrupted() - и пока не завершон
         while (x < 1_000_000_000_000d && !Thread.currentThread().isInterrupted()) {
             try {
+                y = x;
                 Thread.sleep(150);
             } catch (InterruptedException e) {
                 e.printStackTrace();
