@@ -2,7 +2,6 @@ package com.android.threadsapp;
 
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -16,22 +15,18 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        binding.startButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+        binding.startButton.setOnClickListener(view -> {
+            notMainThread();
 
-                notMainThread();
+            binding.resultTextView.setText("Старт!");
 
-                Toast.makeText(MainActivity.this, "Старт", Toast.LENGTH_SHORT).show();
-            }
+            Toast.makeText(MainActivity.this, "Старт", Toast.LENGTH_SHORT).show();
         });
     }
 
-    //бесконечный цыкл
     private void doWork() {
         Thread currentThread = Thread.currentThread();//текущий поток в котором выполняется работа
         Log.d("@@@ doWork", currentThread.getName());//лог текущего потока
@@ -39,29 +34,28 @@ public class MainActivity extends AppCompatActivity {
         // isInterrupted() это проставления фложка (boolean переменная) стоит ли его закончить.
         // Потоки не убивают просто так, он должен закончить свою работу и завершить работу корректно.
 
-
         double x = Math.PI;
         // && currentThread.isInterrupted() - и пока не завершон
-        while (x < 1_000_000_000_000_000d && currentThread.isInterrupted()) {
+        while (x < 1_000_000_000_000d && !currentThread.isInterrupted()) {
             try {
-                Thread.sleep(100);
+                Thread.sleep(150);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
             x += x;
         }
-        Toast.makeText(MainActivity.this, "Финиш", Toast.LENGTH_SHORT).show();
+        binding.resultTextView.setText("ФИНИШ!");
     }
 
     /**
-     * В данных изменениях. Создается thread куда кладется работа myRunnable и запускается start()
-     * В фоне запускается именно myRunnable() поток
+     * В данных изменениях. Создается thread куда кладется работа MyRunnable и запускается start()
+     * В фоне запускается именно MyRunnable() поток
      */
     //запускаем не на главном потоке (асинхронный, поралельный поток)
     //сам посебе Thread бесполезен, в него положить ничего нельзя.
     //Необходимо сделать наследник Thread
     private void notMainThread() {
-        Thread thread = new Thread(new myRunnable(), "Это я, не главный поток");
+        Thread thread = new Thread(new MyRunnable(), "Это я, не главный поток");
         thread.start();
 //        thread.interrupt();//рекомендация остановить
     }
@@ -83,7 +77,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     //наследуем метод Runnable (запускаемый объект)
-    class myRunnable implements Runnable {
+    class MyRunnable implements Runnable {
         @Override
         public void run() {
             doWork();
