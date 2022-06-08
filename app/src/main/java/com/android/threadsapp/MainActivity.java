@@ -1,6 +1,8 @@
 package com.android.threadsapp;
 
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -11,6 +13,9 @@ import com.android.threadsapp.databinding.ActivityMainBinding;
 public class MainActivity extends AppCompatActivity {
 
     private ActivityMainBinding binding;
+    private final Handler handler = new Handler(Looper.getMainLooper());//специальный объект.
+    // это единственный способ положить задачу в очередь.
+    //Можно положить Looper в главном потоке
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,14 +49,14 @@ public class MainActivity extends AppCompatActivity {
             x += x;
         }
         Log.d("@@@ doWork", Thread.currentThread().getName());//лог текущего потока
-        //У любой Активити есть метод run. можно перенести, вернуть поток в главный поток (Пример1)
-        //Ниже приведенный код выполняется на другом потоке
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                Log.d("@@@ doWork", Thread.currentThread().getName());//лог текущего потока
-                binding.resultTextView.setText("ФИНИШ!");
-            }
+
+        //способ положить в очередь на главном потоке, в место run
+        handler.post(() -> {
+            Log.d("@@@ doWork", Thread.currentThread().getName());//лог текущего потока
+            binding.resultTextView.setText("ФИНИШ!");
+            //Поскольку мы находимся на главном потоке, мы можем кинуть Toast
+            //на главном потоке Looper (Петля) есть.
+            Toast.makeText(MainActivity.this, "ФИНИШ!", Toast.LENGTH_SHORT).show();
         });
     }
 
