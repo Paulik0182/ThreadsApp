@@ -1,5 +1,6 @@
 package com.android.threadsapp;
 
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -94,6 +95,29 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void run() {
             doWork();
+        }
+    }
+
+    //Класс для работы с Thread. был раньше, сейчас не используется
+    //Недостаток способа - исчезает при повороте экрана
+    class MyTask extends AsyncTask<String, Integer, String> {
+
+        //Выполняем на главном потоке
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        //Метод который работает в фоне
+        @Override
+        protected String doInBackground(String... strings) {
+            return null;
+        }
+
+        //Выполняется после завершения метода doInBackground на главном потоке
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
         }
     }
 }
