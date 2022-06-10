@@ -9,6 +9,10 @@ public class MyWorkerThread extends Thread {
 
     private final LinkedList<Runnable> queue = new LinkedList<Runnable>();//некая очередь
 
+    //Специальный объект
+    private final Object lock = new Object();//используется в качестве замка. Это когда у нас несколько
+    // объектов которые необходимо обезопасить (в данном примере нужно было обезопасить объект queue
+
     /**
      * После выполнения работы в методе run(), данный поток умирает и его повторно вызвать нельзя.
      * Можно в данном методе запустить бесконечный цыкл, и завершать его по изменению условия.
@@ -40,7 +44,7 @@ public class MyWorkerThread extends Thread {
      * то симофором будет весь Thread (поток, класс).
      */
     public void post(Runnable runnable) {
-        synchronized (queue) {
+        synchronized (lock) {
             queue.add(runnable);//кладем в очередь дополнительную задачу
         }
     }
@@ -58,7 +62,9 @@ public class MyWorkerThread extends Thread {
      * Синхронизация нужна для того чтобы обезопасить очередь, чтобы ее не поломать.
      */
 
-    private synchronized void removeAll() {
-        queue.clear();
+    private void removeAll() {
+        synchronized (lock) {
+            queue.clear();
+        }
     }
 }
