@@ -92,7 +92,7 @@ public class MainActivity extends AppCompatActivity {
         MyWorkerThread MyWorkerThread = new MyWorkerThread();//1.  запустили поток
         MyWorkerThread.start();
 
-        MyWorkerThread.post(() -> {//3.  добавили задачу
+        Runnable runnable = () -> {//3.  добавили задачу
             try {
                 Thread.sleep(3_000);//4.  спим какоето время
             } catch (InterruptedException e) {
@@ -100,7 +100,12 @@ public class MainActivity extends AppCompatActivity {
             }
 
             returnToMainThread();//5. выполняем какуюту работу
-        });
+        };
+
+        MyWorkerThread.post(runnable);
+        MyWorkerThread.post(runnable);
+        MyWorkerThread.post(runnable);
+        MyWorkerThread.post(runnable);
 
     }
 
