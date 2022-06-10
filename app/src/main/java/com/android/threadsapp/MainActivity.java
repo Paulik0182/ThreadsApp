@@ -11,6 +11,43 @@ public class MainActivity extends AppCompatActivity {
 
     private ActivityMainBinding binding;
 
+    /**
+     * Чтобы гарантировать, что обновления переменных предсказуемо распространяются на другие потоки,
+     * мы должны применить летучий модификатор для этих переменных: volatile
+     */
+    private static final int r = 1;// видим переменную по всему классу
+    private static int x = 1;// видим переменную по всему классу
+
+    /**
+     * В потоках нельзя быть уверенным в нормальной видимости переменной.
+     * Например:
+     * Thread thread = new Thread(new Runnable() {
+     * public void run() {
+     * x = y + 3;
+     * .......
+     * <p>
+     * Класс Runnable() под капотом имеет ссылку на всю MainActivity и из нее достает переменные,
+     * поэтому он прекрассно видет глабальные переменные (переменную х) - и это одна из причин
+     * утечек памяти (часто забывают о том, что Runnable имеет ссылку на всю MainActivity), например
+     * активити уже уничтожена, а Runnable удержал на нее ссылку и она живет гдета в фоне и занимает память.
+     * <p>
+     * А с доступом к переменной y есть проблема. Переменная y объявлена в методе onCreate и данная
+     * переменная живет пока не закроется скобка } у метода, не выполнится метод. Поэтому Runnable
+     * имея ссылку на активити видит только глобальные переменные класса а методы исполняют код и закрываются,
+     * тоесть - переменные существуют до тех пор пока метод вызывается, исполняет работу, потом переменная
+     * прекращает свое существование. Но поскольку сохранить ссылку на переменную "y" не возможно,
+     * можно сохранить значение данной переменной, поэтому эту переменную нужно сделать final, в этом
+     * случае Runnable закэширует значение переменной и все.
+     * <p>
+     * Все потоки имеют доступ к одной памяти. Хоть пять Thread запустить, все они будут иметь доступ MainActivity,
+     * а память у них однаи.
+     * Но Thread может кэшировать себе значение (запомнить себе значение на время работы потока),
+     * в связи с этим могут возникать проблемы когда Thread закэшировал "х" , а он процессе работы
+     * уже поменялся, а уже после Thread возьмет и обновит значения "х".
+     * Есть другая проблема, когда работают несколько потоков и они кэшируют значеня, а после пытаются изменить состояния
+     * это может привести к конфликту.
+     */
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -18,7 +55,18 @@ public class MainActivity extends AppCompatActivity {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
+        final int y = 2; // видим переменную только в данном методе
+        int z = 3;
+
         startMyWorkerThread();//запустили паралельный поток
+
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                x = y + 3;
+            }
+        });
+        thread.start();
 
 //        returnToMainThread();
         Handler handler = new Handler();//данный код не корректно читать последовательно.
@@ -39,8 +87,8 @@ public class MainActivity extends AppCompatActivity {
      */
 
     private void startMyWorkerThread() {
-        Thread thread = new MyWorkerThread();
-        thread.start();
+        Thread MyWorkerThread = new MyWorkerThread();
+        MyWorkerThread.start();
     }
 
     private void initView() {
