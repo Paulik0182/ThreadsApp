@@ -12,6 +12,8 @@ import com.android.threadsapp.databinding.ActivityMainBinding;
 public class MainActivity extends AppCompatActivity {
 
     private ActivityMainBinding binding;
+    private final MyWorkerThread myWorkerThread = new MyWorkerThread();//1.  запустили поток
+
 
     /**
      * Чтобы гарантировать, что обновления переменных предсказуемо распространяются на другие потоки,
@@ -89,7 +91,6 @@ public class MainActivity extends AppCompatActivity {
      */
 
     private void startMyWorkerThread() {
-        MyWorkerThread myWorkerThread = new MyWorkerThread();//1.  запустили поток
         myWorkerThread.start();
 
         Runnable runnable = () -> {//3.  добавили задачу
@@ -116,7 +117,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initView() {
-        //todo (инициализация View. это если нет binding)
+        findViewById(R.id.post_button).setOnClickListener((view) -> {
+            myWorkerThread.post(() -> {
+                runOnUiThread(() -> {
+                    Toast.makeText(this, "Click Button", Toast.LENGTH_SHORT).show();
+                });
+            });
+        });
     }
 
     private void returnToMainThread() {
