@@ -40,8 +40,17 @@ public class MyWorkerThread extends Thread {
      * то симофором будет весь Thread (поток, класс).
      */
     public synchronized void post(Runnable runnable) {
-        synchronized (queue) {
-            queue.add(runnable);//кладем в очередь дополнительную задачу
-        }
+        queue.add(runnable);//кладем в очередь дополнительную задачу
+    }
+
+    /**
+     * Можно сделать множесто синхранизирующих методов.
+     * Метод removeAll() будет синхранизирован.
+     * То-есть одновременно не могут выполнятся методы post() и removeAll()
+     * В приведенном примере, синхронизация происходит по всему Thread сразу.
+     */
+
+    private synchronized void removeAll() {
+        queue.clear();
     }
 }
