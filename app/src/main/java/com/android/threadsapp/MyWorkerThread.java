@@ -39,8 +39,10 @@ public class MyWorkerThread extends Thread {
      * Если мы не укажем что мы синхранизируемся по объект queue, а просто укажем метод,
      * то симофором будет весь Thread (поток, класс).
      */
-    public synchronized void post(Runnable runnable) {
-        queue.add(runnable);//кладем в очередь дополнительную задачу
+    public void post(Runnable runnable) {
+        synchronized (queue) {
+            queue.add(runnable);//кладем в очередь дополнительную задачу
+        }
     }
 
     /**
@@ -48,6 +50,12 @@ public class MyWorkerThread extends Thread {
      * Метод removeAll() будет синхранизирован.
      * То-есть одновременно не могут выполнятся методы post() и removeAll()
      * В приведенном примере, синхронизация происходит по всему Thread сразу.
+     * <p>
+     * Если сделать синхронизацию по секции (объекту) -> synchronized (queue)
+     * то в данном случае они будут синхранизироватся по совершенно разным объектам и можно допустить
+     * одновременное попадания в оба метода.
+     * <p>
+     * Синхронизация нужна для того чтобы обезопасить очередь, чтобы ее не поломать.
      */
 
     private synchronized void removeAll() {
