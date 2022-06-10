@@ -26,7 +26,7 @@ public class MyWorkerThread extends Thread {
         }
     }
 
-    private void post(Runnable runnable) {
+    public void post(Runnable runnable) {
         queue.add(runnable);//кладем в очередь дополнительную задачу
     }
 }

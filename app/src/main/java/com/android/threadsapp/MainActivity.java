@@ -2,6 +2,8 @@ package com.android.threadsapp;
 
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -87,8 +89,19 @@ public class MainActivity extends AppCompatActivity {
      */
 
     private void startMyWorkerThread() {
-        Thread MyWorkerThread = new MyWorkerThread();
+        MyWorkerThread MyWorkerThread = new MyWorkerThread();//1.  запустили поток
         MyWorkerThread.start();
+
+        MyWorkerThread.post(() -> {//3.  добавили задачу
+            try {
+                Thread.sleep(3_000);//4.  спим какоето время
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            returnToMainThread();//5. выполняем какуюту работу
+        });
+
     }
 
     private void initView() {
@@ -96,9 +109,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void returnToMainThread() {
-        Handler handler = new Handler();
-        handler.post(() -> {
-            //todo (выполнения какойто работы)
+        Handler handler = new Handler(Looper.getMainLooper());//5.1  создали Handler внутри главного потока
+        handler.post(() -> {//5.2  сразу отдаем выполнение на главный поток
+            Toast.makeText(this, "Привет", Toast.LENGTH_SHORT).show();
         });
     }
 
