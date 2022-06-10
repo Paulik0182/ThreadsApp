@@ -13,7 +13,7 @@ public class MyWorkerThread extends Thread {
     // запускаем бесконечный процесс и кладем туда какуюту работу.
     @Override
     public void run() {
-        while (true) {// бесконечно будет выполнятся работа
+        while (!Thread.interrupted()) {// бесконечно будет выполнятся работа
             doWork();
         }
     }
