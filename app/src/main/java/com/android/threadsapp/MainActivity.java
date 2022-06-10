@@ -89,8 +89,8 @@ public class MainActivity extends AppCompatActivity {
      */
 
     private void startMyWorkerThread() {
-        MyWorkerThread MyWorkerThread = new MyWorkerThread();//1.  запустили поток
-        MyWorkerThread.start();
+        MyWorkerThread myWorkerThread = new MyWorkerThread();//1.  запустили поток
+        myWorkerThread.start();
 
         Runnable runnable = () -> {//3.  добавили задачу
             try {
@@ -102,10 +102,16 @@ public class MainActivity extends AppCompatActivity {
             returnToMainThread();//5. выполняем какуюту работу
         };
 
-        MyWorkerThread.post(runnable);
-        MyWorkerThread.post(runnable);
-        MyWorkerThread.post(runnable);
-        MyWorkerThread.post(runnable);
+        myWorkerThread.post(runnable);
+        myWorkerThread.post(runnable);
+        myWorkerThread.post(runnable);
+        myWorkerThread.post(runnable);
+
+        /*
+         Если мы сделаем interrupt, метод не успеет сделать все задачи и остановится, работы не будут сделаны.
+         Изначально мы ставим в очередь работы, мы не ждем их выполнения, поэтому поток убъется при выполнении первой работы.
+         */
+        myWorkerThread.interrupt();
 
     }
 
