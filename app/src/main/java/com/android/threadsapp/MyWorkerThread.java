@@ -9,10 +9,6 @@ public class MyWorkerThread extends Thread {
 
     private final LinkedList<Runnable> queue = new LinkedList<Runnable>();//некая очередь
 
-    //Специальный объект
-    private final Object lock = new Object();//используется в качестве замка. Это когда у нас несколько
-    // объектов которые необходимо обезопасить (в данном примере нужно было обезопасить объект queue
-
     /**
      * После выполнения работы в методе run(), данный поток умирает и его повторно вызвать нельзя.
      * Можно в данном методе запустить бесконечный цыкл, и завершать его по изменению условия.
@@ -22,11 +18,15 @@ public class MyWorkerThread extends Thread {
     @Override
     public void run() {
         while (!Thread.interrupted()) {// бесконечно будет выполнятся работа
-            if (!queue.isEmpty()) {//если очередь не пуста
-                queue.get(0).run();//берем первый элемент и запускаем его
-                queue.remove(0);// далее удаляем элемент
+            Runnable currentRunnable;
 
+            synchronized (queue) {//способ синхранизировать кусочек кода.
+                if (queue.isEmpty())
+                    continue; //continue - способ прыгнуть на следующий веток цыкла -> на while (!Thread.interrupted())
+                currentRunnable = queue.get(0);//берем первый элемент и запускаем его
+                queue.remove(0);// далее удаляем элемент
             }
+            currentRunnable.run();//пока выполняется run() мы можем делать все остальные методы
         }
     }
 
@@ -43,8 +43,8 @@ public class MyWorkerThread extends Thread {
      * Если мы не укажем что мы синхранизируемся по объект queue, а просто укажем метод,
      * то симофором будет весь Thread (поток, класс).
      */
-    public void post(Runnable runnable) {
-        synchronized (lock) {
+    public synchronized void post(Runnable runnable) {
+        synchronized (queue) {
             queue.add(runnable);//кладем в очередь дополнительную задачу
         }
     }
@@ -62,9 +62,18 @@ public class MyWorkerThread extends Thread {
      * Синхронизация нужна для того чтобы обезопасить очередь, чтобы ее не поломать.
      */
 
-    private void removeAll() {
-        synchronized (lock) {
+    private synchronized void removeAll() {
+        synchronized (queue) {
             queue.clear();
         }
     }
+
+    /**
+     * Недостаток синхронизации методов.
+     * Методы post() и removeAll() не могут выполнится одновременно, но у нас есть бесконечный метод
+     * run() и добавить слово synchronized в него нельзя, так как мы один раз зайдем в него и заблокируем
+     * все приложение, условие не выполнится (оно постоянно будет работать в фоне) и остальные методы
+     * никогда не вызывутся.
+     * Выход только один, синхранизировать только секцию, синхронизировать только конкретную операцию.
+     */
 }

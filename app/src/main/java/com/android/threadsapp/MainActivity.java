@@ -111,7 +111,7 @@ public class MainActivity extends AppCompatActivity {
          Если мы сделаем interrupt, метод не успеет сделать все задачи и остановится, работы не будут сделаны.
          Изначально мы ставим в очередь работы, мы не ждем их выполнения, поэтому поток убъется при выполнении первой работы.
          */
-        myWorkerThread.interrupt();
+//        myWorkerThread.interrupt();
 
     }
 
