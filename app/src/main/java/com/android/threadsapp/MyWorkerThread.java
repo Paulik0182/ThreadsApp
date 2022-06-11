@@ -21,13 +21,8 @@ public class MyWorkerThread extends Thread {
             Runnable currentRunnable;
 
             synchronized (queue) {//способ синхранизировать кусочек кода.
-                if (queue.isEmpty()) {
-                    try {
-                        Thread.currentThread().wait();//(режим ожидания) приостанавливаем выполнение кода в этой секции пока не придут новые данные
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
+                if (queue.isEmpty())
+                    continue; //continue - способ прыгнуть на следующий веток цыкла -> на while (!Thread.interrupted())
                 currentRunnable = queue.get(0);//берем первый элемент и запускаем его
                 queue.remove(0);// далее удаляем элемент
             }
@@ -36,7 +31,7 @@ public class MyWorkerThread extends Thread {
     }
 
     /**
-     * Если у нас несколько потоков и они кидают результаты на главный поток, то есть вероятность,
+     * Если у нас несколько потоков и они кидают результаты на главный поток, есть вероятность,
      * что в какойто момент у нас поломается очередь выполнения работ (получение результатов.
      * Что-бы этого не произошло добавляем в метод -> synchronized
      * synchronized - это делает метод защищенным от одновременного входа нескольких потоков
@@ -48,9 +43,8 @@ public class MyWorkerThread extends Thread {
      * Если мы не укажем что мы синхранизируемся по объект queue, а просто укажем метод,
      * то симофором будет весь Thread (поток, класс).
      */
-    public synchronized void post(Runnable runnable) {
+    public void post(Runnable runnable) {
         synchronized (queue) {
-            queue.notify();// это будет будить выполнение кода (секция которая в режиме ожидания -> Thread.currentThread().wait();)
             queue.add(runnable);//кладем в очередь дополнительную задачу
         }
     }
@@ -68,7 +62,7 @@ public class MyWorkerThread extends Thread {
      * Синхронизация нужна для того чтобы обезопасить очередь, чтобы ее не поломать.
      */
 
-    private synchronized void removeAll() {
+    private void removeAll() {
         synchronized (queue) {
             queue.clear();
         }
