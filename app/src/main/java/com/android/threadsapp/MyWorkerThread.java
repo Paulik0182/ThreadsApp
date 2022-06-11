@@ -21,8 +21,13 @@ public class MyWorkerThread extends Thread {
             Runnable currentRunnable;
 
             synchronized (queue) {//способ синхранизировать кусочек кода.
-                if (queue.isEmpty())
-                    continue; //continue - способ прыгнуть на следующий веток цыкла -> на while (!Thread.interrupted())
+                if (queue.isEmpty()) {
+                    try {
+                        Thread.currentThread().wait();//(режим ожидания) приостанавливаем выполнение кода в этой секции пока не придут новые данные
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
                 currentRunnable = queue.get(0);//берем первый элемент и запускаем его
                 queue.remove(0);// далее удаляем элемент
             }
@@ -45,6 +50,7 @@ public class MyWorkerThread extends Thread {
      */
     public synchronized void post(Runnable runnable) {
         synchronized (queue) {
+            queue.notify();// это будет будить выполнение кода (секция которая в режиме ожидания -> Thread.currentThread().wait();)
             queue.add(runnable);//кладем в очередь дополнительную задачу
         }
     }
