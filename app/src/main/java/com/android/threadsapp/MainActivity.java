@@ -9,30 +9,15 @@ import androidx.appcompat.app.AppCompatActivity;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final int LOOPS_IN_THREADS = 5_000;
+    private static final int LOOPS_IN_THREADS = 500;
 
-    private int asyncCounter = 0;
-    private int syncCounter = 0;
+    private final Counter asyncCounter = new Counter();
+    private final Counter syncCounter = new Counter();
     private int threadCounter = 0;
     private Button startButton;
     private TextView asyncCounterTv;
     private TextView syncCounterTv;
     private TextView threadCounterTv;
-    @SuppressLint("SetTextI18n")
-    private final Runnable workRunnable = () -> {
-        for (int i = 0; i < LOOPS_IN_THREADS; i++) {//цакличность выполнения
-            asyncCounter++;
-
-            runOnUiThread(() -> {// Синхронная секция. Он становится в очередь на главный поток
-                syncCounter++;
-            });
-        }
-
-        runOnUiThread(() -> {// обновление view с основным значением
-            asyncCounterTv.setText("Async: " + asyncCounter);
-            syncCounterTv.setText("Sync: " + syncCounter);
-        });
-    };
 
     @SuppressLint("SetTextI18n")
     @Override
@@ -58,6 +43,22 @@ public class MainActivity extends AppCompatActivity {
             new Thread(workRunnable).start();
         });
     }
+
+    @SuppressLint("SetTextI18n")
+    private final Runnable workRunnable = () -> {
+        for (int i = 0; i < LOOPS_IN_THREADS; i++) {//цакличность выполнения
+            asyncCounter.counter++;
+
+            runOnUiThread(() -> {// Синхронная секция. Он становится в очередь на главный поток
+                syncCounter.counter++;
+            });
+        }
+
+        runOnUiThread(() -> {// обновление view с основным значением
+            asyncCounterTv.setText("Async: " + asyncCounter.counter);
+            syncCounterTv.setText("Sync: " + syncCounter.counter);
+        });
+    };
 
     private void initView() {
 
