@@ -9,7 +9,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final int LOOPS_IN_THREADS = 500;
+    private static final int LOOPS_IN_THREADS = 5_000;
 
     private final Counter asyncCounter = new Counter();
     private final Counter syncCounter = new Counter();
@@ -48,15 +48,9 @@ public class MainActivity extends AppCompatActivity {
     private final Runnable workRunnable = () -> {
         for (int i = 0; i < LOOPS_IN_THREADS; i++) {//цакличность выполнения
             asyncCounter.counter++;
-
-            runOnUiThread(() -> {// Синхронная секция. Он становится в очередь на главный поток
-                syncCounter.counter++;
-            });
         }
-
         runOnUiThread(() -> {// обновление view с основным значением
             asyncCounterTv.setText("Async: " + asyncCounter.counter);
-            syncCounterTv.setText("Sync: " + syncCounter.counter);
         });
     };
 
