@@ -1,5 +1,6 @@
 package com.android.threadsapp;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.TextView;
@@ -8,20 +9,37 @@ import androidx.appcompat.app.AppCompatActivity;
 
 public class MainActivity extends AppCompatActivity {
 
+    private static final int LOOPS_IN_THREADS = 100;
+
     private final int asyncCounter = 0;
-    private final int syncCounter = 0;
-    private final int threadCounter = 0;
+    private int syncCounter = 0;
+    private int threadCounter = 0;
     private Button startButton;
     private TextView asyncCounterTv;
     private TextView syncCounterTv;
     private TextView threadCounterTv;
 
+    @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         initView();
+
+        startButton.setOnClickListener((v) -> {
+            threadCounter++; // действие по нажатию на кнопку в главном потоке
+            threadCounterTv.setText("Exp: " + (threadCounter * LOOPS_IN_THREADS));
+
+            new Thread(() -> {//Новый поток
+                for (int i = 0; i < LOOPS_IN_THREADS; i++) {//цакличность выполнения
+                    runOnUiThread(() -> {// Синхронная секция. Он становится в очередь на главный поток
+                        syncCounter++;
+                        syncCounterTv.setText("Sync: " + syncCounter);
+                    });
+                }
+            }).start();
+        });
 
     }
 
