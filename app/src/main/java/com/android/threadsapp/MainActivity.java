@@ -11,7 +11,7 @@ public class MainActivity extends AppCompatActivity {
 
     private static final int LOOPS_IN_THREADS = 100;
 
-    private final int asyncCounter = 0;
+    private int asyncCounter = 0;
     private int syncCounter = 0;
     private int threadCounter = 0;
     private Button startButton;
@@ -32,12 +32,27 @@ public class MainActivity extends AppCompatActivity {
             threadCounterTv.setText("Exp: " + (threadCounter * LOOPS_IN_THREADS));
 
             new Thread(() -> {//Новый поток
+
+                try {
+                    Thread.sleep(2_000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
                 for (int i = 0; i < LOOPS_IN_THREADS; i++) {//цакличность выполнения
+                    asyncCounter++;
                     runOnUiThread(() -> {// Синхронная секция. Он становится в очередь на главный поток
                         syncCounter++;
                         syncCounterTv.setText("Sync: " + syncCounter);
+
                     });
                 }
+
+                runOnUiThread(() -> {// обновление view с основным значением
+                    asyncCounterTv.setText("Async: " + asyncCounter);
+
+                });
+
             }).start();
         });
 
