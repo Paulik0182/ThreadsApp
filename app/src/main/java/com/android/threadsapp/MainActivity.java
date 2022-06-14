@@ -9,7 +9,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final int LOOPS_IN_THREADS = 100;
+    private static final int LOOPS_IN_THREADS = 5_000;
 
     private int asyncCounter = 0;
     private int syncCounter = 0;
@@ -18,6 +18,21 @@ public class MainActivity extends AppCompatActivity {
     private TextView asyncCounterTv;
     private TextView syncCounterTv;
     private TextView threadCounterTv;
+    @SuppressLint("SetTextI18n")
+    private final Runnable workRunnable = () -> {
+        for (int i = 0; i < LOOPS_IN_THREADS; i++) {//цакличность выполнения
+            asyncCounter++;
+
+            runOnUiThread(() -> {// Синхронная секция. Он становится в очередь на главный поток
+                syncCounter++;
+            });
+        }
+
+        runOnUiThread(() -> {// обновление view с основным значением
+            asyncCounterTv.setText("Async: " + asyncCounter);
+            syncCounterTv.setText("Sync: " + syncCounter);
+        });
+    };
 
     @SuppressLint("SetTextI18n")
     @Override
@@ -29,33 +44,19 @@ public class MainActivity extends AppCompatActivity {
 
         startButton.setOnClickListener((v) -> {
             threadCounter++; // действие по нажатию на кнопку в главном потоке
-            threadCounterTv.setText("Exp: " + (threadCounter * LOOPS_IN_THREADS));
+            threadCounterTv.setText("Exp: " + (threadCounter * LOOPS_IN_THREADS * 10));
 
-            new Thread(() -> {//Новый поток
-
-                try {
-                    Thread.sleep(2_000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-
-                for (int i = 0; i < LOOPS_IN_THREADS; i++) {//цакличность выполнения
-                    asyncCounter++;
-                    runOnUiThread(() -> {// Синхронная секция. Он становится в очередь на главный поток
-                        syncCounter++;
-                        syncCounterTv.setText("Sync: " + syncCounter);
-
-                    });
-                }
-
-                runOnUiThread(() -> {// обновление view с основным значением
-                    asyncCounterTv.setText("Async: " + asyncCounter);
-
-                });
-
-            }).start();
+            new Thread(workRunnable).start();
+            new Thread(workRunnable).start();
+            new Thread(workRunnable).start();
+            new Thread(workRunnable).start();
+            new Thread(workRunnable).start();
+            new Thread(workRunnable).start();
+            new Thread(workRunnable).start();
+            new Thread(workRunnable).start();
+            new Thread(workRunnable).start();
+            new Thread(workRunnable).start();
         });
-
     }
 
     private void initView() {
