@@ -9,15 +9,24 @@ import androidx.appcompat.app.AppCompatActivity;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final int LOOPS_IN_THREADS = 5_000;
+    private static final long LOOPS_IN_THREADS = 500_000L;
 
     private final Counter asyncCounter = new Counter();
     private final Counter syncCounter = new Counter();
-    private int threadCounter = 0;
+    private final int threadCounter = 0;
     private Button startButton;
     private TextView asyncCounterTv;
     private TextView syncCounterTv;
     private TextView threadCounterTv;
+    @SuppressLint("SetTextI18n")
+    private final Runnable workRunnable = () -> {
+        for (int i = 0; i < LOOPS_IN_THREADS; i++) {//цакличность выполнения
+            asyncCounter.inc();
+        }
+        runOnUiThread(() -> {// обновление view с основным значением
+            asyncCounterTv.setText("Async: " + asyncCounter.getCounter());
+        });
+    };
 
     @SuppressLint("SetTextI18n")
     @Override
@@ -28,8 +37,9 @@ public class MainActivity extends AppCompatActivity {
         initView();
 
         startButton.setOnClickListener((v) -> {
-            threadCounter++; // действие по нажатию на кнопку в главном потоке
-            threadCounterTv.setText("Exp: " + (threadCounter * LOOPS_IN_THREADS * 10));
+            asyncCounter.reset();
+            syncCounter.reset();
+            threadCounterTv.setText("Exp: " + (LOOPS_IN_THREADS * 10));
 
             new Thread(workRunnable).start();
             new Thread(workRunnable).start();
@@ -43,16 +53,6 @@ public class MainActivity extends AppCompatActivity {
             new Thread(workRunnable).start();
         });
     }
-
-    @SuppressLint("SetTextI18n")
-    private final Runnable workRunnable = () -> {
-        for (int i = 0; i < LOOPS_IN_THREADS; i++) {//цакличность выполнения
-            asyncCounter.counter++;
-        }
-        runOnUiThread(() -> {// обновление view с основным значением
-            asyncCounterTv.setText("Async: " + asyncCounter.counter);
-        });
-    };
 
     private void initView() {
 
