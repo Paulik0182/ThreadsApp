@@ -53,11 +53,11 @@ public class MainActivity extends AppCompatActivity {
             new Thread(workRunnable).start();
 
             //необходимо запретить создавать более одного Singleton
-            MySingleton single1 = MySingleton.getInstance();
-            MySingleton single2 = MySingleton.getInstance();
-            MySingleton single3 = MySingleton.getInstance();
-            MySingleton single4 = MySingleton.getInstance();
-            MySingleton single5 = MySingleton.getInstance();
+            MySingleton single1 = new MySingleton();
+            MySingleton single2 = new MySingleton();
+            MySingleton single3 = new MySingleton();
+            MySingleton single4 = new MySingleton();
+            MySingleton single5 = new MySingleton();
         });
     }
 
