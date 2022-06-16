@@ -54,10 +54,10 @@ public class MainActivity extends AppCompatActivity {
 
             //необходимо запретить создавать более одного Singleton
             MySingleton single1 = new MySingleton();
-            MySingleton single2 = new MySingleton();
-            MySingleton single3 = new MySingleton();
-            MySingleton single4 = new MySingleton();
-            MySingleton single5 = new MySingleton();
+
+            //это тожесамое ожидаемое поведение (как код выше), единственный экземпляр.
+            // Все синглтон нужно доставать через Application
+            ((App) getApplication()).getSingleton();
         });
     }
 
