@@ -1,34 +1,72 @@
 package com.android.threadsapp;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
-
-import com.google.android.material.snackbar.Snackbar;
+import android.widget.Button;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.view.View;
-
-import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
-import androidx.navigation.ui.AppBarConfiguration;
-import androidx.navigation.ui.NavigationUI;
-
-import com.android.threadsapp.databinding.ActivityMainBinding;
-
-import android.view.Menu;
-import android.view.MenuItem;
-
 public class MainActivity extends AppCompatActivity {
 
-    private ActivityMainBinding binding;
+    private static final long LOOPS_IN_THREADS = 500_000L;
 
+    private final Counter asyncCounter = new Counter();
+    private final Counter syncCounter = new Counter();
+    private final int threadCounter = 0;
+    private Button startButton;
+    private TextView asyncCounterTv;
+    private TextView syncCounterTv;
+    private TextView threadCounterTv;
+    @SuppressLint("SetTextI18n")
+    private final Runnable workRunnable = () -> {
+        for (int i = 0; i < LOOPS_IN_THREADS; i++) {//цакличность выполнения
+            asyncCounter.inc();
+        }
+        runOnUiThread(() -> {// обновление view с основным значением
+            asyncCounterTv.setText("Async: " + asyncCounter.getCounter());
+        });
+    };
+
+    @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
 
-        binding = ActivityMainBinding.inflate(getLayoutInflater());
-        setContentView(binding.getRoot());
+        initView();
 
+        startButton.setOnClickListener((v) -> {
+            asyncCounter.reset();
+            syncCounter.reset();
+            threadCounterTv.setText("Exp: " + (LOOPS_IN_THREADS * 10));
+
+            new Thread(workRunnable).start();
+            new Thread(workRunnable).start();
+            new Thread(workRunnable).start();
+            new Thread(workRunnable).start();
+            new Thread(workRunnable).start();
+            new Thread(workRunnable).start();
+            new Thread(workRunnable).start();
+            new Thread(workRunnable).start();
+            new Thread(workRunnable).start();
+            new Thread(workRunnable).start();
+
+            //необходимо запретить создавать более одного Singleton
+            MySingleton single1 = new MySingleton();
+
+            //это тожесамое ожидаемое поведение (как код выше), единственный экземпляр.
+            // Все синглтон нужно доставать через Application
+            ((App) getApplication()).getSingleton();
+        });
     }
 
+    private void initView() {
+
+        startButton = findViewById(R.id.start_thread_button);
+        asyncCounterTv = findViewById(R.id.async_counter_text_view);
+        syncCounterTv = findViewById(R.id.sync_counter_text_view);
+        threadCounterTv = findViewById(R.id.threads_counter_text_view);
+
+    }
 }
